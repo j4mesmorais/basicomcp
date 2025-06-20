@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  basicomcp:
+    image: basicomcp_api:1.0
+    container_name: basicomcp
+    restart: always
+
+    labels:
+
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik_public"
+      - "traefik.http.routers.basicomcp.rule=Host(`basicomcp.adjunto.com.br`)"
+      - "traefik.http.routers.basicomcp.entrypoints=websecure"
+      - "traefik.http.routers.basicomcp.priority=1"
+      - "traefik.http.routers.basicomcp.tls.certresolver=le"
+      - "traefik.http.routers.basicomcp.middlewares=basicomcp-security"
+      - "traefik.http.middlewares.basicomcp-security.headers.stsSeconds=63072000"
+      - "traefik.http.middlewares.basicomcp-security.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.basicomcp-security.headers.stsPreload=true"
+      - "traefik.http.middlewares.basicomcp-security.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.basicomcp-security.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.basicomcp-security.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.basicomcp-security.headers.frameDeny=true"
+
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.5'
+
+    networks:
+      - traefik_public
+      - agent_network
+
+
+networks:
+  traefik_public:
+    external: true
+  agent_network:
+    external: true
